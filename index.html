@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirQ Intelligence - Future-Oriented Air Quality Forecasting</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container flex items-center justify-between">
+            <div class="navbar-brand">
+                <h2 class="brand-text">AirQ Intelligence</h2>
+                <span class="brand-subtitle">Future-Oriented Air Quality Intelligence</span>
+            </div>
+            <div class="navbar-menu">
+                <button id="login-btn" class="btn btn--outline">Login</button>
+                <button id="register-btn" class="btn btn--primary">Register</button>
+                <button id="dashboard-btn" class="btn btn--primary hidden">Dashboard</button>
+                <button id="logout-btn" class="btn btn--outline hidden">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Landing Page -->
+    <main id="landing-page" class="landing-page">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Advanced Air Quality Forecasting</h1>
+                    <p class="hero-subtitle">Powered by Sentinel-5P/TROPOMI satellite data and cutting-edge machine learning models for precise O₃ and NO₂ predictions</p>
+                    <div class="hero-actions">
+                        <button id="get-started-btn" class="btn btn--primary btn--lg">Get Started</button>
+                        <button id="learn-more-btn" class="btn btn--outline btn--lg">Learn More</button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="air-quality-animation">
+                        <div class="pollution-particle particle-1"></div>
+                        <div class="pollution-particle particle-2"></div>
+                        <div class="pollution-particle particle-3"></div>
+                        <div class="pollution-particle particle-4"></div>
+                        <div class="clean-air-indicator"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Advanced Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon satellite-icon"></div>
+                        <h3>Sentinel-5P Data</h3>
+                        <p>Real-time satellite observations from TROPOMI sensor for accurate atmospheric monitoring</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon ml-icon"></div>
+                        <h3>ML Forecasting</h3>
+                        <p>ConvLSTM and Transformer models for precise short-term air quality predictions</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon realtime-icon"></div>
+                        <h3>Real-time Updates</h3>
+                        <p>Continuous data integration with ERA5 meteorological data for enhanced accuracy</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Authentication Modal -->
+    <div id="auth-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <h2>Welcome Back</h2>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Sign In</button>
+                </form>
+                <p class="auth-switch">Don't have an account? <a href="#" id="switch-to-register">Register</a></p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form hidden">
+                <h2>Create Account</h2>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" placeholder="Create a password" required>
+                        <div class="password-strength">
+                            <div class="strength-bar"></div>
+                            <span class="strength-text">Password strength</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="#" id="switch-to-login">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard hidden">
+        <!-- Dashboard Header -->
+        <header class="dashboard-header">
+            <div class="container flex items-center justify-between">
+                <h1>Air Quality Dashboard</h1>
+                <div class="dashboard-controls">
+                    <select id="location-select" class="form-control">
+                        <option value="">Select Location</option>
+                        <option value="1">Chennai Central</option>
+                        <option value="2">Delhi Connaught Place</option>
+                        <option value="3">Mumbai Bandra</option>
+                        <option value="4">Bangalore Whitefield</option>
+                    </select>
+                    <button id="settings-btn" class="btn btn--outline">Settings</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="container">
+                <!-- Real-time Overview -->
+                <section class="overview-section">
+                    <div class="overview-cards">
+                        <div class="overview-card o3-card">
+                            <h3>Ozone (O₃)</h3>
+                            <div class="metric-value" id="current-o3">42.5 µg/m³</div>
+                            <div class="status status--moderate">Moderate</div>
+                        </div>
+                        <div class="overview-card no2-card">
+                            <h3>Nitrogen Dioxide (NO₂)</h3>
+                            <div class="metric-value" id="current-no2">28.3 µg/m³</div>
+                            <div class="status status--good">Good</div>
+                        </div>
+                        <div class="overview-card aqi-card">
+                            <h3>Air Quality Index</h3>
+                            <div class="metric-value" id="current-aqi">78</div>
+                            <div class="status status--moderate">Moderate</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Map and Charts -->
+                <section class="data-section">
+                    <div class="data-grid">
+                        <!-- Interactive Map -->
+                        <div class="map-container">
+                            <h3>Spatial Distribution</h3>
+                            <div id="air-quality-map" class="map"></div>
+                        </div>
+
+                        <!-- Time Series Chart -->
+                        <div class="chart-container">
+                            <h3>Forecasting Models</h3>
+                            <div class="model-controls">
+                                <select id="model-select" class="form-control">
+                                    <option value="transformer">Transformer Model</option>
+                                    <option value="convlstm">ConvLSTM Model</option>
+                                </select>
+                                <div class="model-metrics">
+                                    <span>Accuracy: <strong id="model-accuracy">91%</strong></span>
+                                    <span>RMSE: <strong id="model-rmse">2.89</strong></span>
+                                </div>
+                            </div>
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="forecast-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Historical Data -->
+                <section class="historical-section">
+                    <h3>Historical vs Predicted</h3>
+                    <div class="chart-container">
+                        <div style="position: relative; height: 250px;">
+                            <canvas id="historical-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-overlay"></div>
+        <div class="settings-content">
+            <h3>Settings</h3>
+            <button class="settings-close">&times;</button>
+            
+            <div class="settings-section">
+                <h4>Appearance</h4>
+                <div class="setting-item">
+                    <label>Theme</label>
+                    <select id="theme-select" class="form-control">
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>Data Preferences</h4>
+                <div class="setting-item">
+                    <label>Refresh Interval</label>
+                    <select class="form-control">
+                        <option value="5">5 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="60">1 hour</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" checked> Real-time notifications
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" checked> Forecast alerts
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <div id="chatbot" class="chatbot">
+        <button id="chatbot-toggle" class="chatbot-toggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </button>
+        
+        <div id="chatbot-window" class="chatbot-window hidden">
+            <div class="chatbot-header">
+                <h4>Air Quality Assistant</h4>
+                <button id="chatbot-close" class="chatbot-close">×</button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Hello! I'm your AI air quality assistant. Ask me about current conditions, forecasts, or air quality data.
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input-field" placeholder="Ask about air quality..." class="form-control">
+                <button id="chatbot-send" class="btn btn--primary">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-branding">DESIGNED AND OPERATED BY UDHAY - ID 25040132019</p>
+                <p class="footer-tagline">Future-Oriented Air Quality Intelligence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
